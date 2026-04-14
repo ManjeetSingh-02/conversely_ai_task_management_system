@@ -9,7 +9,8 @@ import z from 'zod';
 const envSchema = z.object({
   ORIGIN_URL: z.url({ error: 'ORIGIN_URL must be a valid URL' }),
   PORT: z.coerce.number().int().positive(),
-  DATABASE_URL: z.url({ error: 'DATABASE_URL must be a valid URL' }),
+  MONGO_DB_URI: z.url({ error: 'MONGO_DB_URI must be a valid URL' }),
+  POSTGRES_DB_URI: z.url({ error: 'POSTGRES_DB_URI must be a valid URL' }),
   NODE_ENV: z.enum(Object.values(APP_CONFIG.NODE_ENVS)),
   COOKIE_SECRET: z.string().min(32, { error: 'COOKIE_SECRET must be atleast 32 chars' }),
 });
