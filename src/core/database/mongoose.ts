@@ -1,0 +1,49 @@
+// internal-imports
+import { APP_CONFIG } from '../config/constants.js';
+
+// external-imports
+import mongoose from 'mongoose';
+
+// schema for task
+const taskSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 3,
+      maxLength: 30,
+    },
+    description: {
+      type: String,
+      trim: true,
+      minLength: 10,
+      maxLength: 100,
+    },
+    status: {
+      type: String,
+      enum: Object.values(APP_CONFIG.TASK_STATUS),
+      default: APP_CONFIG.TASK_STATUS.PENDING,
+    },
+    createdBy: {
+      type: String,
+      required: true,
+    },
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// index for createdBy field in task schema
+taskSchema.index({ createdBy: 1 });
+
+// unique index for title and createdBy fields in task schema
+taskSchema.index({ title: 1, createdBy: 1 }, { unique: true });
+
+// export task model
+export const Tasks = mongoose.models.Tasks ?? mongoose.model('Tasks', taskSchema);
