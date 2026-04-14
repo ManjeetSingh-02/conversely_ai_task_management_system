@@ -4,9 +4,13 @@ import { env, logger } from '@/core/index.js';
 
 // external-imports
 import http from 'http';
+import mongoose from 'mongoose';
 
 // function to start the server
 async function startServer(): Promise<void> {
+  // connect to mongodb via mongoose
+  await mongoose.connect(env.MONGO_DB_URI);
+
   // create express application
   const application = createApp();
 
