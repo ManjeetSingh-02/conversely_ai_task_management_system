@@ -20,4 +20,10 @@ export const APP_CONFIG = {
     DATE_PATTERN: 'YYYY-MM-DD',
     TIMESTAMP_FORMAT: 'HH:mm:ss',
   },
+
+  // all available task status
+  TASK_STATUS: {
+    PENDING: 'pending',
+    COMPLETED: 'completed',
+  },
 };
