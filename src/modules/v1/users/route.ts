@@ -1,7 +1,7 @@
 // internal-imports
 import { controller } from './controller.js';
 import { userCredentialsSchema } from './zod.js';
-import { asyncHandler, validateZodSchema } from '@/core/index.js';
+import { asyncHandler, authenticate, validateZodSchema } from '@/core/index.js';
 
 // external-imports
 import { Router } from 'express';
@@ -19,4 +19,4 @@ router.get('/', controller.getUserProfile);
 router.post('/login', validateZodSchema(userCredentialsSchema), asyncHandler(controller.loginUser));
 
 // @route POST /logout
-router.post('/', controller.logoutUser);
+router.post('/logout', asyncHandler(authenticate), asyncHandler(controller.logoutUser));

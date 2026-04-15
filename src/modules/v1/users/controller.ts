@@ -14,6 +14,9 @@ import {
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
 
+// type definition for authenticated request
+type AuthenticatedRequest = Request & { user?: { id: string } };
+
 // controller for module
 export const controller = {
   // @controller POST /
@@ -112,5 +115,28 @@ export const controller = {
   },
 
   // @controller POST /logout
-  logoutUser: () => {},
+  logoutUser: async (request: AuthenticatedRequest, response: Response<ISuccessResponse<null>>) => {
+    // clear refresh token from database
+    await prisma.users.update({
+      where: { id: request.user?.id },
+      data: { refreshToken: null },
+    });
+
+    // return success response and clear refreshToken cookie
+    return response
+      .status(200)
+      .clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: env.NODE_ENV === APP_CONFIG.NODE_ENVS.PRODUCTION,
+        signed: true,
+        sameSite: env.NODE_ENV === APP_CONFIG.NODE_ENVS.PRODUCTION ? 'none' : 'lax',
+        maxAge: env.REFRESH_TOKEN_LIFETIME,
+      })
+      .json(
+        new SuccessResponse({
+          message: 'Logout successful',
+          data: null,
+        })
+      );
+  },
 };
