@@ -7,6 +7,9 @@ export { env } from './config/env.js';
 export { Tasks } from './database/mongoose.js';
 export { prisma } from './database/prisma.js';
 
+// lib
+export { compare, hash } from './lib/bcrypt.js';
+
 // loader
 export { default as loadModules } from './loader/modules.js';
 
