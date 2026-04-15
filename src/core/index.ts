@@ -9,6 +9,7 @@ export { prisma } from './database/prisma.js';
 
 // lib
 export { compare, hash } from './lib/bcrypt.js';
+export { generateSignedToken } from './lib/jwt.js';
 
 // loader
 export { default as loadModules } from './loader/modules.js';
