@@ -1,5 +1,7 @@
 // internal-imports
 import { controller } from './controller.js';
+import { createUserSchema } from './zod.js';
+import { asyncHandler, validateZodSchema } from '@/core/index.js';
 
 // external-imports
 import { Router } from 'express';
@@ -8,7 +10,7 @@ import { Router } from 'express';
 export const router = Router();
 
 // @route POST /
-router.post('/', controller.createUser);
+router.post('/', validateZodSchema(createUserSchema), asyncHandler(controller.createUser));
 
 // @route GET /
 router.get('/', controller.getUserProfile);
