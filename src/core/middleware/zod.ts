@@ -6,7 +6,7 @@ import type { ZodObject } from 'zod';
 import type { Request, Response, NextFunction } from 'express';
 
 // function for validating request body using zod schema
-export default function (schema: ZodObject) {
+export function validateZodSchema(schema: ZodObject) {
   return function (request: Request, response: Response, nextFunction: NextFunction) {
     // validate request against the provided schema
     const result = schema.safeParse({

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 import type { Application } from 'express';
 
 // function to initialize all modules
-export default async function (application: Application) {
+export async function loadModules(application: Application) {
   // get the modules directory path
   const completeModulesDirPath = path.join(
     path.dirname(fileURLToPath(import.meta.url)),

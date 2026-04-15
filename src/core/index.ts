@@ -12,14 +12,14 @@ export { compare, hash } from './lib/bcrypt.js';
 export { generateSignedToken } from './lib/jwt.js';
 
 // loader
-export { default as loadModules } from './loader/modules.js';
+export { loadModules } from './loader/modules.js';
 
 // logger
 export { logger } from './logger/winston.js';
 
 // middleware
 export { authenticate } from './middleware/authenticate.js';
-export { default as validateZodSchema } from './middleware/zod.js';
+export { validateZodSchema } from './middleware/zod.js';
 
 // response
 export { ErrorResponse } from './response/error.js';
@@ -29,4 +29,4 @@ export { SuccessResponse } from './response/success.js';
 export type { IErrorResponse, ISuccessResponse } from './types/response.js';
 
 // utils
-export { default as asyncHandler } from './utils/async-handler.js';
+export { asyncHandler } from './utils/async-handler.js';
