@@ -96,12 +96,12 @@ export const controller = {
     const accessToken = generateSignedToken({
       payload: { id: existingUser.id },
       secretKey: env.ACCESS_TOKEN_SECRET,
-      options: { expiresIn: env.ACCESS_TOKEN_LIFETIME },
+      options: { expiresIn: env.ACCESS_TOKEN_LIFETIME / 1000 },
     });
     const refreshToken = generateSignedToken({
       payload: { id: existingUser.id },
       secretKey: env.REFRESH_TOKEN_SECRET,
-      options: { expiresIn: env.REFRESH_TOKEN_LIFETIME },
+      options: { expiresIn: env.REFRESH_TOKEN_LIFETIME / 1000 },
     });
 
     // store refresh token in database
