@@ -58,7 +58,21 @@ export const controller = {
   },
 
   // @controller GET /
-  getUserProfile: () => {},
+  getUser: async (request: AuthenticatedRequest, response: Response<ISuccessResponse<object>>) => {
+    // get user details from database
+    const existingUser = await prisma.users.findUnique({
+      where: { id: request.user?.id },
+      omit: { password: true, refreshToken: true },
+    });
+
+    // return success response with user data
+    return response.status(200).json(
+      new SuccessResponse({
+        message: 'User details retrieved successfully',
+        data: { existingUser },
+      })
+    );
+  },
 
   // @controller POST /login
   loginUser: async (

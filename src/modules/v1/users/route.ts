@@ -13,7 +13,7 @@ export const router = Router();
 router.post('/', validateZodSchema(userCredentialsSchema), asyncHandler(controller.registerUser));
 
 // @route GET /
-router.get('/', controller.getUserProfile);
+router.get('/', asyncHandler(authenticate), asyncHandler(controller.getUser));
 
 // @route POST /login
 router.post('/login', validateZodSchema(userCredentialsSchema), asyncHandler(controller.loginUser));
