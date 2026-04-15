@@ -16,7 +16,7 @@ router.post('/', validateZodSchema(userCredentialsSchema), asyncHandler(controll
 router.get('/', controller.getUserProfile);
 
 // @route POST /login
-router.post('/', controller.loginUser);
+router.post('/login', validateZodSchema(userCredentialsSchema), asyncHandler(controller.loginUser));
 
 // @route POST /logout
 router.post('/', controller.logoutUser);

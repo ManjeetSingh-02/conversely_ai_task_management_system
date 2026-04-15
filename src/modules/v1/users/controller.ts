@@ -1,5 +1,14 @@
 // internal-imports
-import { ErrorResponse, hash, prisma, SuccessResponse } from '@/core/index.js';
+import {
+  APP_CONFIG,
+  compare,
+  env,
+  ErrorResponse,
+  generateSignedToken,
+  hash,
+  prisma,
+  SuccessResponse,
+} from '@/core/index.js';
 
 // type-imports
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
@@ -49,7 +58,58 @@ export const controller = {
   getUserProfile: () => {},
 
   // @controller POST /login
-  loginUser: () => {},
+  loginUser: async (
+    request: Request,
+    response: Response<ISuccessResponse<object> | IErrorResponse<null>>
+  ) => {
+    // check if login credentials are valid
+    const existingUser = await prisma.users.findUnique({
+      where: { email: request.body.email },
+    });
+    if (!existingUser || !(await compare(request.body.password, existingUser.password)))
+      return response.status(401).json(
+        new ErrorResponse({
+          code: 'INVALID_CREDENTIALS',
+          message: 'Invalid email or password',
+          issues: null,
+        })
+      );
+
+    // generate access and refresh tokens
+    const accessToken = generateSignedToken({
+      payload: { id: existingUser.id },
+      secretKey: env.ACCESS_TOKEN_SECRET,
+      options: { expiresIn: env.ACCESS_TOKEN_LIFETIME },
+    });
+    const refreshToken = generateSignedToken({
+      payload: { id: existingUser.id },
+      secretKey: env.REFRESH_TOKEN_SECRET,
+      options: { expiresIn: env.REFRESH_TOKEN_LIFETIME },
+    });
+
+    // store refresh token in database
+    await prisma.users.update({
+      where: { id: existingUser.id },
+      data: { refreshToken },
+    });
+
+    // return success response with access token and set refreshToken in httpOnly cookie
+    return response
+      .status(200)
+      .cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: env.NODE_ENV === APP_CONFIG.NODE_ENVS.PRODUCTION,
+        signed: true,
+        sameSite: env.NODE_ENV === APP_CONFIG.NODE_ENVS.PRODUCTION ? 'none' : 'lax',
+        maxAge: env.REFRESH_TOKEN_LIFETIME,
+      })
+      .json(
+        new SuccessResponse({
+          message: 'Login successful',
+          data: { accessToken },
+        })
+      );
+  },
 
   // @controller POST /logout
   logoutUser: () => {},
