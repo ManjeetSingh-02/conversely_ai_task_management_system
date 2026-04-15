@@ -1,3 +1,6 @@
+// internal-imports
+import { APP_CONFIG } from '@/core/index.js';
+
 // external-imports
 import z from 'zod';
 
@@ -32,6 +35,15 @@ export const createTaskSchema = z.object({
   body: z.object({
     title: titleSchema,
     description: descriptionSchema,
+    dueDate: dueDateSchema,
+  }),
+});
+
+// schema for updateTask
+export const updateTaskSchema = z.object({
+  body: z.object({
+    description: descriptionSchema,
+    status: z.enum(Object.values(APP_CONFIG.TASK_STATUS)),
     dueDate: dueDateSchema,
   }),
 });

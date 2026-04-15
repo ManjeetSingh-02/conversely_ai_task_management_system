@@ -1,6 +1,6 @@
 // internal-imports
 import { controller } from './controller.js';
-import { createTaskSchema } from './zod.js';
+import { createTaskSchema, updateTaskSchema } from './zod.js';
 import { asyncHandler, authenticateUser, validateZodSchema } from '@/core/index.js';
 
 // external-imports
@@ -24,7 +24,12 @@ router.get('/', asyncHandler(authenticateUser), asyncHandler(controller.getTasks
 router.get('/:id', asyncHandler(authenticateUser), asyncHandler(controller.getTask));
 
 // @route PATCH /:id
-router.patch('/:id', controller.updateTask);
+router.patch(
+  '/:id',
+  asyncHandler(authenticateUser),
+  validateZodSchema(updateTaskSchema),
+  asyncHandler(controller.updateTask)
+);
 
 // @route DELETE /:id
-router.delete('/:id', controller.deleteTask);
+router.delete('/:id', asyncHandler(authenticateUser), asyncHandler(controller.deleteTask));

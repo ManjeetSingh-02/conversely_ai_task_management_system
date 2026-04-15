@@ -101,8 +101,78 @@ export const controller = {
   },
 
   // @controller PATCH /:id
-  updateTask: () => {},
+  updateTask: async (
+    request: AuthenticatedRequest,
+    response: Response<ISuccessResponse<null> | IErrorResponse<null>>
+  ) => {
+    // fetch task by id from database
+    const existingTask = await tasks.findOne({
+      _id: request.params.id,
+      createdBy: request.user?.id,
+    });
+    if (!existingTask)
+      return response.status(404).json(
+        new ErrorResponse({
+          code: 'TASK_NOT_FOUND',
+          message: 'No task found with the provided ID for the authenticated user',
+          issues: null,
+        })
+      );
+
+    // object to hold fields that needs to be updated
+    const updationData: {
+      description?: string;
+      status?: string;
+      dueDate?: Date;
+    } = {};
+
+    // add task fields in updationData if provided
+    if (request.body.description) updationData.description = request.body.description;
+    if (request.body.status) updationData.status = request.body.status;
+    if (request.body.dueDate) updationData.dueDate = request.body.dueDate;
+
+    await tasks.findByIdAndUpdate(existingTask._id, updationData);
+
+    // return success response indicating successful update
+    return response.status(200).json(
+      new SuccessResponse({
+        message: 'Task updated successfully',
+        data: null,
+      })
+    );
+  },
 
   // @controller DELETE /:id
-  deleteTask: () => {},
+  deleteTask: async (
+    request: AuthenticatedRequest,
+    response: Response<ISuccessResponse<null> | IErrorResponse<null>>
+  ) => {
+    // fetch task by id from database
+    const existingTask = await tasks
+      .findOne({
+        _id: request.params.id,
+        createdBy: request.user?.id,
+      })
+      .select('_id')
+      .lean();
+    if (!existingTask)
+      return response.status(404).json(
+        new ErrorResponse({
+          code: 'TASK_NOT_FOUND',
+          message: 'No task found with the provided ID for the authenticated user',
+          issues: null,
+        })
+      );
+
+    // delete task from database
+    await tasks.findByIdAndDelete(existingTask._id);
+
+    // return success response indicating successful update
+    return response.status(200).json(
+      new SuccessResponse({
+        message: 'Task deleted successfully',
+        data: null,
+      })
+    );
+  },
 };
