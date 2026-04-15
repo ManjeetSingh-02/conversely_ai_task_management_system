@@ -8,7 +8,7 @@ import type { Request, Response } from 'express';
 // controller for module
 export const controller = {
   // @controller POST /
-  createUser: async (
+  registerUser: async (
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse<null>>
   ) => {

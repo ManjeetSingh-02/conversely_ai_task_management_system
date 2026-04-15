@@ -10,7 +10,7 @@ import { Router } from 'express';
 export const router = Router();
 
 // @route POST /
-router.post('/', validateZodSchema(userCredentialsSchema), asyncHandler(controller.createUser));
+router.post('/', validateZodSchema(userCredentialsSchema), asyncHandler(controller.registerUser));
 
 // @route GET /
 router.get('/', controller.getUserProfile);
