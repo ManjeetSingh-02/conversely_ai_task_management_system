@@ -13,6 +13,14 @@ const envSchema = z.object({
   POSTGRES_DB_URI: z.url({ error: 'POSTGRES_DB_URI must be a valid URL' }),
   NODE_ENV: z.enum(Object.values(APP_CONFIG.NODE_ENVS)),
   COOKIE_SECRET: z.string().min(32, { error: 'COOKIE_SECRET must be atleast 32 chars' }),
+  ACCESS_TOKEN_SECRET: z
+    .string()
+    .min(32, { error: 'ACCESS_TOKEN_SECRET must be atleast 32 chars' }),
+  ACCESS_TOKEN_LIFETIME: z.coerce.number().int().positive(),
+  REFRESH_TOKEN_SECRET: z
+    .string()
+    .min(32, { error: 'REFRESH_TOKEN_SECRET must be atleast 32 chars' }),
+  REFRESH_TOKEN_LIFETIME: z.coerce.number().int().positive(),
 });
 
 // function to validate environment variables
