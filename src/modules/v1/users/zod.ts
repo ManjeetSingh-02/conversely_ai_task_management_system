@@ -1,8 +1,8 @@
 // external-imports
 import z from 'zod';
 
-// schema for createUser
-export const createUserSchema = z.object({
+// schema for userCredentials
+export const userCredentialsSchema = z.object({
   body: z.object({
     email: z.email({ error: 'Invalid email address' }),
     password: z
