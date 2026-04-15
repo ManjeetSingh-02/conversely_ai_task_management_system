@@ -1,8 +1,5 @@
 // internal-imports
-import { ErrorResponse, prisma, SuccessResponse } from '@/core/index.js';
-
-// external-imports
-import bcrypt from 'bcryptjs';
+import { ErrorResponse, hash, prisma, SuccessResponse } from '@/core/index.js';
 
 // type-imports
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
@@ -20,7 +17,7 @@ export const controller = {
       where: { email: request.body.email },
     });
     if (existingUser)
-      return response.status(400).json(
+      return response.status(409).json(
         new ErrorResponse({
           code: 'USER_ALREADY_EXISTS',
           message: 'A user with this email already exists.',
@@ -32,7 +29,7 @@ export const controller = {
     const newUser = await prisma.users.create({
       data: {
         email: request.body.email,
-        password: await bcrypt.hash(request.body.password, 10),
+        password: await hash(request.body.password, 10),
       },
     });
 
