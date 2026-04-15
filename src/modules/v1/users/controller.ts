@@ -1,11 +1,11 @@
 // internal-imports
 import {
   APP_CONFIG,
-  compare,
+  compareHashedData,
   env,
   ErrorResponse,
   generateSignedToken,
-  hash,
+  hashData,
   prisma,
   SuccessResponse,
 } from '@/core/index.js';
@@ -41,7 +41,7 @@ export const controller = {
     const newUser = await prisma.users.create({
       data: {
         email: request.body.email,
-        password: await hash(request.body.password, 10),
+        password: await hashData(request.body.password, 10),
       },
     });
 
@@ -83,7 +83,7 @@ export const controller = {
     const existingUser = await prisma.users.findUnique({
       where: { email: request.body.email },
     });
-    if (!existingUser || !(await compare(request.body.password, existingUser.password)))
+    if (!existingUser || !(await compareHashedData(request.body.password, existingUser.password)))
       return response.status(401).json(
         new ErrorResponse({
           code: 'INVALID_CREDENTIALS',

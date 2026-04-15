@@ -9,7 +9,7 @@ import type { IErrorResponse } from '../types/response.js';
 import type { Request, Response, NextFunction } from 'express';
 
 // function to authenticate user
-export async function authenticate(
+export async function authenticateUser(
   request: Request & { user?: { id: string } },
   response: Response<IErrorResponse<null>>,
   nextFunction: NextFunction

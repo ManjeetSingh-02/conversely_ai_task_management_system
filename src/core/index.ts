@@ -8,7 +8,7 @@ export { tasks } from './database/mongoose.js';
 export { prisma } from './database/prisma.js';
 
 // lib
-export { compare, hash } from './lib/bcrypt.js';
+export { compareHashedData, hashData } from './lib/bcrypt.js';
 export { generateSignedToken } from './lib/jwt.js';
 
 // loader
@@ -18,7 +18,7 @@ export { loadModules } from './loader/modules.js';
 export { logger } from './logger/winston.js';
 
 // middleware
-export { authenticate } from './middleware/authenticate.js';
+export { authenticateUser } from './middleware/authenticate.js';
 export { validateZodSchema } from './middleware/zod.js';
 
 // response
