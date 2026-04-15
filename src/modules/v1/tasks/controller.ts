@@ -21,7 +21,7 @@ export const controller = {
       return response.status(409).json(
         new ErrorResponse({
           code: 'TASK_ALREADY_EXISTS',
-          message: 'A task with this title already exists.',
+          message: 'A task with this title already exists',
           issues: null,
         })
       );
@@ -37,7 +37,7 @@ export const controller = {
     // return success response with new task data
     return response.status(201).json(
       new SuccessResponse({
-        message: 'Task creation successful',
+        message: 'Task created successfully',
         data: {
           id: newTask.id,
           title: newTask.title,
@@ -63,7 +63,7 @@ export const controller = {
     // return success response with user tasks data
     return response.status(200).json(
       new SuccessResponse({
-        message: 'All user tasks retrieved successfully',
+        message: 'Tasks retrieved successfully',
         data: userTasks,
       })
     );

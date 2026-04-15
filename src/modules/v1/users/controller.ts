@@ -32,7 +32,7 @@ export const controller = {
       return response.status(409).json(
         new ErrorResponse({
           code: 'USER_ALREADY_EXISTS',
-          message: 'A user with this email already exists.',
+          message: 'A user with this email already exists',
           issues: null,
         })
       );
@@ -48,7 +48,7 @@ export const controller = {
     // return success response with new user data
     return response.status(201).json(
       new SuccessResponse({
-        message: 'User registration successful',
+        message: 'User registered successfully',
         data: {
           id: newUser.id,
           email: newUser.email,
@@ -68,7 +68,7 @@ export const controller = {
     // return success response with user data
     return response.status(200).json(
       new SuccessResponse({
-        message: 'User details retrieved successfully',
+        message: 'User profile fetched successfully',
         data: { existingUser },
       })
     );
@@ -122,7 +122,7 @@ export const controller = {
       })
       .json(
         new SuccessResponse({
-          message: 'Login successful',
+          message: 'User logged in successfully',
           data: { accessToken },
         })
       );
@@ -148,7 +148,7 @@ export const controller = {
       })
       .json(
         new SuccessResponse({
-          message: 'Logout successful',
+          message: 'User logged out successfully',
           data: null,
         })
       );
