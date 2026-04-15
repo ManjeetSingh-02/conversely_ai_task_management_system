@@ -45,5 +45,5 @@ taskSchema.index({ createdBy: 1 });
 // unique index for title and createdBy fields in task schema
 taskSchema.index({ title: 1, createdBy: 1 }, { unique: true });
 
-// export task model
-export const Tasks = mongoose.models.Tasks ?? mongoose.model('Tasks', taskSchema);
+// task model
+export const tasks = mongoose.model('tasks', taskSchema);

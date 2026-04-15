@@ -4,7 +4,7 @@ export { corsConfig } from './config/cors.js';
 export { env } from './config/env.js';
 
 // database
-export { Tasks } from './database/mongoose.js';
+export { tasks } from './database/mongoose.js';
 export { prisma } from './database/prisma.js';
 
 // lib
