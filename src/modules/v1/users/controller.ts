@@ -57,7 +57,7 @@ export const controller = {
     );
   },
 
-  // @controller GET /
+  // @controller GET /profile
   getUser: async (request: AuthenticatedRequest, response: Response<ISuccessResponse<object>>) => {
     // get user details from database
     const existingUser = await prisma.users.findUnique({

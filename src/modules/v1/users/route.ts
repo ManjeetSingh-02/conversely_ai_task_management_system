@@ -12,8 +12,8 @@ export const router = Router();
 // @route POST /
 router.post('/', validateZodSchema(userCredentialsSchema), asyncHandler(controller.registerUser));
 
-// @route GET /
-router.get('/', asyncHandler(authenticateUser), asyncHandler(controller.getUser));
+// @route GET /profile
+router.get('/profile', asyncHandler(authenticateUser), asyncHandler(controller.getUser));
 
 // @route POST /login
 router.post('/login', validateZodSchema(userCredentialsSchema), asyncHandler(controller.loginUser));
