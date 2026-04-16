@@ -25,10 +25,8 @@ export function validateZodSchema(schema: ZodObject) {
         })
       );
 
-    // replace request data with the validated data, if available
-    if (result.data.body) Object.assign(request.body, result.data.body);
-    if (result.data.query) Object.assign(request.query, result.data.query);
-    if (result.data.params) Object.assign(request.params, result.data.params);
+    // add validated data to request.validated
+    request.validated = result.data;
 
     // forward request to next middleware
     nextFunction();
