@@ -10,7 +10,7 @@ export const controller = {
   // @controller POST /
   createTask: async (
     request: Request,
-    response: Response<ISuccessResponse<object> | IErrorResponse<null>>
+    response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
     // check if task already exists
     const existingTask = await tasks.findOne({ title: request.body.title }).select('id').lean();
@@ -19,7 +19,6 @@ export const controller = {
         new ErrorResponse({
           code: 'TASK_ALREADY_EXISTS',
           message: 'A task with this title already exists',
-          issues: null,
         })
       );
 
@@ -66,7 +65,7 @@ export const controller = {
   // @controller GET /:id
   getTask: async (
     request: Request,
-    response: Response<ISuccessResponse<object> | IErrorResponse<null>>
+    response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
     // fetch task by id from database
     const existingTask = await tasks
@@ -81,7 +80,6 @@ export const controller = {
         new ErrorResponse({
           code: 'TASK_NOT_FOUND',
           message: 'No task found with the provided ID for the authenticated user',
-          issues: null,
         })
       );
 
@@ -95,10 +93,7 @@ export const controller = {
   },
 
   // @controller PATCH /:id
-  updateTask: async (
-    request: Request,
-    response: Response<ISuccessResponse<null> | IErrorResponse<null>>
-  ) => {
+  updateTask: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
     // fetch task by id from database
     const existingTask = await tasks.findOne({
       _id: request.params.id,
@@ -109,7 +104,6 @@ export const controller = {
         new ErrorResponse({
           code: 'TASK_NOT_FOUND',
           message: 'No task found with the provided ID for the authenticated user',
-          issues: null,
         })
       );
 
@@ -131,16 +125,12 @@ export const controller = {
     return response.status(200).json(
       new SuccessResponse({
         message: 'Task updated successfully',
-        data: null,
       })
     );
   },
 
   // @controller DELETE /:id
-  deleteTask: async (
-    request: Request,
-    response: Response<ISuccessResponse<null> | IErrorResponse<null>>
-  ) => {
+  deleteTask: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
     // fetch task by id from database
     const existingTask = await tasks
       .findOne({
@@ -154,7 +144,6 @@ export const controller = {
         new ErrorResponse({
           code: 'TASK_NOT_FOUND',
           message: 'No task found with the provided ID for the authenticated user',
-          issues: null,
         })
       );
 
@@ -165,7 +154,6 @@ export const controller = {
     return response.status(200).json(
       new SuccessResponse({
         message: 'Task deleted successfully',
-        data: null,
       })
     );
   },

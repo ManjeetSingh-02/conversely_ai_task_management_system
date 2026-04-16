@@ -19,7 +19,7 @@ export const controller = {
   // @controller POST /
   registerUser: async (
     request: Request,
-    response: Response<ISuccessResponse<object> | IErrorResponse<null>>
+    response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
     // check if user already exists
     const existingUser = await prisma.users.findUnique({
@@ -30,7 +30,6 @@ export const controller = {
         new ErrorResponse({
           code: 'USER_ALREADY_EXISTS',
           message: 'A user with this email already exists',
-          issues: null,
         })
       );
 
@@ -66,7 +65,7 @@ export const controller = {
     return response.status(200).json(
       new SuccessResponse({
         message: 'User profile fetched successfully',
-        data: { existingUser },
+        data: existingUser!,
       })
     );
   },
@@ -74,7 +73,7 @@ export const controller = {
   // @controller POST /login
   loginUser: async (
     request: Request,
-    response: Response<ISuccessResponse<object> | IErrorResponse<null>>
+    response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
     // check if login credentials are valid
     const existingUser = await prisma.users.findUnique({
@@ -85,7 +84,6 @@ export const controller = {
         new ErrorResponse({
           code: 'INVALID_CREDENTIALS',
           message: 'Invalid email or password',
-          issues: null,
         })
       );
 
@@ -126,7 +124,7 @@ export const controller = {
   },
 
   // @controller POST /logout
-  logoutUser: async (request: Request, response: Response<ISuccessResponse<null>>) => {
+  logoutUser: async (request: Request, response: Response<ISuccessResponse>) => {
     // clear refresh token from database
     await prisma.users.update({
       where: { id: request.user!.id },
@@ -146,7 +144,6 @@ export const controller = {
       .json(
         new SuccessResponse({
           message: 'User logged out successfully',
-          data: null,
         })
       );
   },

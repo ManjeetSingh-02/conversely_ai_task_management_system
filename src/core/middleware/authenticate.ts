@@ -11,7 +11,7 @@ import type { Request, Response, NextFunction } from 'express';
 // function to authenticate user
 export async function authenticateUser(
   request: Request,
-  response: Response<IErrorResponse<null>>,
+  response: Response<IErrorResponse>,
   nextFunction: NextFunction
 ) {
   // get authorization header
@@ -21,7 +21,6 @@ export async function authenticateUser(
       new ErrorResponse({
         code: 'UNAUTHORIZED',
         message: 'Missing access token',
-        issues: null,
       })
     );
 
@@ -35,7 +34,6 @@ export async function authenticateUser(
       new ErrorResponse({
         code: 'UNAUTHORIZED',
         message: 'Invalid access token',
-        issues: null,
       })
     );
 
@@ -48,7 +46,6 @@ export async function authenticateUser(
       new ErrorResponse({
         code: 'UNAUTHORIZED',
         message: 'Invalid access token',
-        issues: null,
       })
     );
 

@@ -8,11 +8,10 @@ import type { Request, Response } from 'express';
 // controller for module
 export const controller = {
   // @controller GET /
-  checkHealth: (_request: Request, response: Response<ISuccessResponse<null>>) => {
+  checkHealth: (_request: Request, response: Response<ISuccessResponse>) => {
     return response.status(200).json(
       new SuccessResponse({
         message: 'Service is healthy',
-        data: null,
       })
     );
   },
