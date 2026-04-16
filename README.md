@@ -55,7 +55,7 @@ pnpm prisma migrate dev
 pnpm prisma generate
 ```
 
-7. Now create `src/core/database/prisma.ts` file and add the following code:
+7. Now go to `src/core/database/prisma.ts` file and add the following code:
 ```typescript
 // internal-imports
 import { env } from '../config/env.js';
