@@ -115,6 +115,7 @@ pnpm dev
 │   │   │   ├── error.ts
 │   │   │   └── success.ts
 │   │   ├── types
+│   │   │   ├── express.d.ts
 │   │   │   └── response.ts
 │   │   ├── utils
 │   │   │   └── async-handler.ts
