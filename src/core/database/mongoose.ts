@@ -22,8 +22,8 @@ const taskSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: Object.values(APP_CONFIG.TASK_STATUS),
-      default: APP_CONFIG.TASK_STATUS.PENDING,
+      enum: Object.values(APP_CONFIG.TASK_CONFIG.STATUS),
+      default: APP_CONFIG.TASK_CONFIG.STATUS.PENDING,
     },
     createdBy: {
       type: String,

@@ -21,9 +21,25 @@ export const APP_CONFIG = {
     TIMESTAMP_FORMAT: 'HH:mm:ss',
   },
 
-  // all available task status
-  TASK_STATUS: {
-    PENDING: 'pending',
-    COMPLETED: 'completed',
+  // all task related constants
+  TASK_CONFIG: {
+    // all available task status
+    STATUS: {
+      PENDING: 'pending',
+      COMPLETED: 'completed',
+    },
+
+    // all available task sort options
+    SORT_OPTIONS: {
+      TITLE: 'title',
+      DUE_DATE: 'dueDate',
+      CREATED_AT: 'createdAt',
+    },
+
+    // all available sort orders
+    SORT_ORDERS: {
+      ASC: 'asc',
+      DESC: 'desc',
+    },
   },
 };
