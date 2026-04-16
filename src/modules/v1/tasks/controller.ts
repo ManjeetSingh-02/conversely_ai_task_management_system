@@ -1,9 +1,18 @@
 // internal-imports
-import { ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
+import { APP_CONFIG, ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
 
 // type-imports
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
+
+// type definition for query
+type Query = {
+  status?: string;
+  sortBy: string;
+  sortOrder: string;
+  page: number;
+  limit: number;
+};
 
 // controller for module
 export const controller = {
@@ -46,18 +55,41 @@ export const controller = {
   },
 
   // @controller GET /
-  getTasks: async (request: Request, response: Response<ISuccessResponse<Array<object>>>) => {
+  getTasks: async (request: Request, response: Response<ISuccessResponse<object, object>>) => {
+    // constants to hold query and filters
+    const query = request.validated!.query as Query;
+    const queryFilters: { createdBy: string; status?: string } = { createdBy: request.user!.id };
+    const sortFilters: Record<string, 1 | -1> = {
+      [query.sortBy]: query.sortOrder === APP_CONFIG.TASK_CONFIG.SORT_ORDERS.ASC ? 1 : -1,
+    };
+
+    // if status filter is provided add it in filters object
+    if (query.status) queryFilters.status = query.status;
+
     // fetch all user tasks from database
     const userTasks = await tasks
-      .find({ createdBy: request.user!.id })
+      .find(queryFilters)
       .select('_id title status')
+      .skip((query.page - 1) * query.limit)
+      .limit(query.limit)
+      .sort(sortFilters)
       .lean();
+
+    // count total user tasks from database
+    const totalUserTasksCount = await tasks.countDocuments({ createdBy: request.user!.id });
 
     // return success response with user tasks data
     return response.status(200).json(
       new SuccessResponse({
         message: 'Tasks retrieved successfully',
         data: userTasks,
+        meta: {
+          page: query.page,
+          limit: query.limit,
+          count: userTasks.length,
+          total: totalUserTasksCount,
+          pages: Math.ceil(totalUserTasksCount / query.limit),
+        },
       })
     );
   },
@@ -119,6 +151,7 @@ export const controller = {
     if (request.body.status) updationData.status = request.body.status;
     if (request.body.dueDate) updationData.dueDate = request.body.dueDate;
 
+    // update task in database
     await tasks.findByIdAndUpdate(existingTask._id, updationData);
 
     // return success response indicating successful update
