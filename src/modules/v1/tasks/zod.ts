@@ -2,6 +2,7 @@
 import { APP_CONFIG } from '@/core/index.js';
 
 // external-imports
+import mongoose from 'mongoose';
 import z from 'zod';
 
 // schema for title
@@ -30,6 +31,12 @@ const dueDateSchema = z.iso
   .transform(value => new Date(value))
   .refine(date => date.getTime() > Date.now(), { error: 'Must be in the future' });
 
+// schema for mongooseObjectId
+const mongooseObjectId = z
+  .string()
+  .trim()
+  .refine(id => mongoose.Types.ObjectId.isValid(id), { error: 'Invalid ID' });
+
 // schema for createTask
 export const createTaskSchema = z.object({
   body: z.object({
@@ -41,9 +48,14 @@ export const createTaskSchema = z.object({
 
 // schema for updateTask
 export const updateTaskSchema = z.object({
-  body: z.object({
-    description: descriptionSchema,
-    status: z.enum(Object.values(APP_CONFIG.TASK_STATUS)),
-    dueDate: dueDateSchema,
+  params: z.object({
+    id: mongooseObjectId,
   }),
+  body: z
+    .object({
+      description: descriptionSchema.optional(),
+      status: z.enum(Object.values(APP_CONFIG.TASK_STATUS)).optional(),
+      dueDate: dueDateSchema.optional(),
+    })
+    .refine(data => Object.keys(data).length > 0, { error: 'At least one field must be provided' }),
 });
