@@ -27,7 +27,7 @@ export const controller = {
     const newTask = await tasks.create({
       title: request.body.title,
       description: request.body.description,
-      createdBy: request.user?.id,
+      createdBy: request.user!.id,
       dueDate: request.body.dueDate,
     });
 
@@ -50,7 +50,7 @@ export const controller = {
   getTasks: async (request: Request, response: Response<ISuccessResponse<Array<object>>>) => {
     // fetch all user tasks from database
     const userTasks = await tasks
-      .find({ createdBy: request.user?.id })
+      .find({ createdBy: request.user!.id })
       .select('_id title status')
       .lean();
 
@@ -72,7 +72,7 @@ export const controller = {
     const existingTask = await tasks
       .findOne({
         _id: request.params.id,
-        createdBy: request.user?.id,
+        createdBy: request.user!.id,
       })
       .select('-createdBy -__v')
       .lean();
@@ -102,7 +102,7 @@ export const controller = {
     // fetch task by id from database
     const existingTask = await tasks.findOne({
       _id: request.params.id,
-      createdBy: request.user?.id,
+      createdBy: request.user!.id,
     });
     if (!existingTask)
       return response.status(404).json(
@@ -145,7 +145,7 @@ export const controller = {
     const existingTask = await tasks
       .findOne({
         _id: request.params.id,
-        createdBy: request.user?.id,
+        createdBy: request.user!.id,
       })
       .select('_id')
       .lean();

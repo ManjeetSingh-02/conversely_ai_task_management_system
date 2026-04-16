@@ -58,7 +58,7 @@ export const controller = {
   getUser: async (request: Request, response: Response<ISuccessResponse<object>>) => {
     // get user details from database
     const existingUser = await prisma.users.findUnique({
-      where: { id: request.user?.id },
+      where: { id: request.user!.id },
       omit: { password: true, refreshToken: true },
     });
 
@@ -129,7 +129,7 @@ export const controller = {
   logoutUser: async (request: Request, response: Response<ISuccessResponse<null>>) => {
     // clear refresh token from database
     await prisma.users.update({
-      where: { id: request.user?.id },
+      where: { id: request.user!.id },
       data: { refreshToken: null },
     });
 
