@@ -7,6 +7,7 @@ Task management system for conversely.ai backend developer internship
 - [Folder Structure](#folder-structure)
   - [Tree structure of the project](#tree-structure-of-the-project)
   - [Explanation of the folder structure](#explanation-of-the-folder-structure)
+- [Demo](#demo)
 
 ## Installation
 0. Make sure you have the following installed on your machine:
@@ -44,12 +45,17 @@ REFRESH_TOKEN_SECRET=minimum_of_32_char_refresh_token_secret
 REFRESH_TOKEN_LIFETIME=86400000
 ```
 
-5. Generate prisma client:
+5. Run prisma migrations to create the necessary tables in the PostgreSQL database:
+```bash
+pnpm prisma migrate dev
+```
+
+6. Generate prisma client:
 ```bash
 pnpm prisma generate
 ```
 
-6. Now create `src/core/database/prisma.ts` file and add the following code:
+7. Now create `src/core/database/prisma.ts` file and add the following code:
 ```typescript
 // internal-imports
 import { env } from '../config/env.js';
@@ -64,7 +70,7 @@ export const prisma = new PrismaClient({
 });
 ```
 
-7. Start the development server:
+8. Start the development server:
 ```bash
 pnpm dev
 ```
@@ -153,3 +159,6 @@ pnpm dev
     - `app` folder contains the main application setup, including the Express application.
     - `core` folder contains all the core functionalities, such as database connections, configurations, utilities, and middleware.
     - `modules` folder contains the different modules of the application, each module is organized into its own folder with its controller, route, and zod schema.
+
+## Demo
+- Video Link: [Click Here](https://drive.google.com/drive/folders/1rcLjSXk-wQqOeC_9sWBdOKmvwarksRSn)
