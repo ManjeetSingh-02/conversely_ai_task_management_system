@@ -1,0 +1,290 @@
+{
+  "info": {
+    "_postman_id": "6bc9be97-7168-4ac6-84cf-ce0eb271094b",
+    "name": "conversely_ai_task_management_system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40778073"
+  },
+  "item": [
+    {
+      "name": "users",
+      "item": [
+        {
+          "name": "/",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"@Abcdefgh1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/users",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/users/profile",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["users", "profile"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@test.com\",\n    \"password\": \"@Abcdefgh1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/users/login",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["users", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/users/logout",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["users", "logout"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "noauth"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        }
+      ]
+    },
+    {
+      "name": "tasks",
+      "item": [
+        {
+          "name": "/",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Title-1\",\n    \"description\": \"Title-1 Desc\",\n    \"dueDate\": \"2026-06-01T12:01:30-05:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tasks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tasks"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69dfe0e67295ae63970215b5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"description\": \"Title-1 Desc\",\n    \"status\": \"completed\",\n    \"dueDate\": \"2027-06-01T12:01:30-05:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69dfe0e67295ae63970215b5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tasks", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69dfe0e67295ae63970215b5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{access_token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": ""
+    }
+  ]
+}
