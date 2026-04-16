@@ -10,7 +10,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 // function to authenticate user
 export async function authenticateUser(
-  request: Request & { user?: { id: string } },
+  request: Request,
   response: Response<IErrorResponse<null>>,
   nextFunction: NextFunction
 ) {

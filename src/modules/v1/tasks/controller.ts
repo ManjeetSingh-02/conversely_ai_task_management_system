@@ -5,14 +5,11 @@ import { ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
 
-// type definition for authenticated request
-type AuthenticatedRequest = Request & { user?: { id: string } };
-
 // controller for module
 export const controller = {
   // @controller POST /
   createTask: async (
-    request: AuthenticatedRequest,
+    request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse<null>>
   ) => {
     // check if task already exists
@@ -50,10 +47,7 @@ export const controller = {
   },
 
   // @controller GET /
-  getTasks: async (
-    request: AuthenticatedRequest,
-    response: Response<ISuccessResponse<Array<object>>>
-  ) => {
+  getTasks: async (request: Request, response: Response<ISuccessResponse<Array<object>>>) => {
     // fetch all user tasks from database
     const userTasks = await tasks
       .find({ createdBy: request.user?.id })
@@ -71,7 +65,7 @@ export const controller = {
 
   // @controller GET /:id
   getTask: async (
-    request: AuthenticatedRequest,
+    request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse<null>>
   ) => {
     // fetch task by id from database
@@ -102,7 +96,7 @@ export const controller = {
 
   // @controller PATCH /:id
   updateTask: async (
-    request: AuthenticatedRequest,
+    request: Request,
     response: Response<ISuccessResponse<null> | IErrorResponse<null>>
   ) => {
     // fetch task by id from database
@@ -144,7 +138,7 @@ export const controller = {
 
   // @controller DELETE /:id
   deleteTask: async (
-    request: AuthenticatedRequest,
+    request: Request,
     response: Response<ISuccessResponse<null> | IErrorResponse<null>>
   ) => {
     // fetch task by id from database

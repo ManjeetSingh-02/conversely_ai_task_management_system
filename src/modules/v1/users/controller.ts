@@ -14,9 +14,6 @@ import {
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
 
-// type definition for authenticated request
-type AuthenticatedRequest = Request & { user?: { id: string } };
-
 // controller for module
 export const controller = {
   // @controller POST /
@@ -58,7 +55,7 @@ export const controller = {
   },
 
   // @controller GET /profile
-  getUser: async (request: AuthenticatedRequest, response: Response<ISuccessResponse<object>>) => {
+  getUser: async (request: Request, response: Response<ISuccessResponse<object>>) => {
     // get user details from database
     const existingUser = await prisma.users.findUnique({
       where: { id: request.user?.id },
@@ -129,7 +126,7 @@ export const controller = {
   },
 
   // @controller POST /logout
-  logoutUser: async (request: AuthenticatedRequest, response: Response<ISuccessResponse<null>>) => {
+  logoutUser: async (request: Request, response: Response<ISuccessResponse<null>>) => {
     // clear refresh token from database
     await prisma.users.update({
       where: { id: request.user?.id },
