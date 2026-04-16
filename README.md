@@ -28,7 +28,7 @@ pnpm install
 
 3. Run docker containers for PostgreSQL and MongoDB:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 4. Create a `.env` file in the root directory and add the following variables:
