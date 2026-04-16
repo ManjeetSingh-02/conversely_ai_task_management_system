@@ -155,9 +155,31 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{localhost:3000}}{{api/v1}}/tasks",
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks?status=pending&sortBy=dueDate&sortOrder=asc&page=1&limit=3",
               "host": ["{{localhost:3000}}{{api/v1}}"],
-              "path": ["tasks"]
+              "path": ["tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "dueDate"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "asc"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "3"
+                }
+              ]
             }
           },
           "response": []
@@ -174,7 +196,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69dfe0e67295ae63970215b5"
+                  "value": "69e0a1d118bea5b14c6f334f"
                 }
               ]
             }
@@ -202,7 +224,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69dfe0e67295ae63970215b5"
+                  "value": "69e0a1d118bea5b14c6f334f"
                 }
               ]
             }
@@ -221,7 +243,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69dfe0e67295ae63970215b5"
+                  "value": "69e0a21518bea5b14c6f335b"
                 }
               ]
             }
