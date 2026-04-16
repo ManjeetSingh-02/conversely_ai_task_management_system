@@ -46,6 +46,21 @@ export const createTaskSchema = z.object({
   }),
 });
 
+// schema for getTasks
+export const getTasksSchema = z.object({
+  query: z.object({
+    status: z.enum(Object.values(APP_CONFIG.TASK_CONFIG.STATUS)).optional(),
+    sortBy: z
+      .enum(Object.values(APP_CONFIG.TASK_CONFIG.SORT_OPTIONS))
+      .default(APP_CONFIG.TASK_CONFIG.SORT_OPTIONS.CREATED_AT),
+    sortOrder: z
+      .enum(Object.values(APP_CONFIG.TASK_CONFIG.SORT_ORDERS))
+      .default(APP_CONFIG.TASK_CONFIG.SORT_ORDERS.DESC),
+    page: z.coerce.number().int().positive().default(1),
+    limit: z.coerce.number().int().positive().max(10).default(5),
+  }),
+});
+
 // schema for getTask and deleteTask
 export const getTaskAndDeleteTaskSchema = z.object({
   params: z.object({
@@ -61,7 +76,7 @@ export const updateTaskSchema = z.object({
   body: z
     .object({
       description: descriptionSchema.optional(),
-      status: z.enum(Object.values(APP_CONFIG.TASK_STATUS)).optional(),
+      status: z.enum(Object.values(APP_CONFIG.TASK_CONFIG.STATUS)).optional(),
       dueDate: dueDateSchema.optional(),
     })
     .refine(data => Object.keys(data).length > 0, { error: 'At least one field must be provided' }),
