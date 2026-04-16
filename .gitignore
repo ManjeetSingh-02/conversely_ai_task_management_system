@@ -145,4 +145,3 @@ vite.config.ts.timestamp-*
 
 # prisma
 src/core/database/generated/prisma
-src/core/database/prisma.ts
