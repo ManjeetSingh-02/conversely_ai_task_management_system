@@ -4,14 +4,15 @@ interface IBaseResponse {
 }
 
 // interface for SuccessResponse
-export interface ISuccessResponse<T = unknown> extends IBaseResponse {
+export interface ISuccessResponse<D = undefined, M = undefined> extends IBaseResponse {
   readonly success: true;
-  readonly data: T;
+  readonly data?: D;
+  readonly meta?: M;
 }
 
 // interface for ErrorResponse
-export interface IErrorResponse<T = unknown> extends IBaseResponse {
+export interface IErrorResponse<I = undefined> extends IBaseResponse {
   readonly success: false;
   readonly code: string;
-  readonly issues: T;
+  readonly issues?: I;
 }
