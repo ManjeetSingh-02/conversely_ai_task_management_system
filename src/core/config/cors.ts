@@ -11,4 +11,4 @@ export const corsConfig: CorsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   exposedHeaders: ['Set-Cookie', '*'],
-};
+} as const;
