@@ -46,6 +46,13 @@ export const createTaskSchema = z.object({
   }),
 });
 
+// schema for getTask and deleteTask
+export const getTaskAndDeleteTaskSchema = z.object({
+  params: z.object({
+    id: mongooseObjectId,
+  }),
+});
+
 // schema for updateTask
 export const updateTaskSchema = z.object({
   params: z.object({
