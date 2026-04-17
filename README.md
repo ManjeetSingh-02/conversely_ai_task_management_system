@@ -55,11 +55,11 @@ pnpm prisma migrate dev
 pnpm prisma generate
 ```
 
-7. Now go to `src/core/database/prisma.ts` file and add the following code:
+7. Now go to `src/core/database/prisma/client.ts` file and add the following code:
 ```typescript
 // internal-imports
-import { env } from '../config/env.js';
-import { PrismaClient } from './generated/prisma/client.js';
+import { env } from '../../config/env.js';
+import { PrismaClient } from './generated/client.js';
 
 // external-imports
 import { PrismaPg } from '@prisma/adapter-pg';
