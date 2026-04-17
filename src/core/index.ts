@@ -4,8 +4,8 @@ export { corsConfig } from './config/cors.js';
 export { env } from './config/env.js';
 
 // database
-export { tasks } from './database/mongoose.js';
-export { prisma } from './database/prisma.js';
+export { prisma } from './database/prisma/client.js';
+export { tasks, categories, tags } from './database/mongoose/index.js';
 
 // lib
 export { compareHashedData, hashData } from './lib/bcrypt.js';

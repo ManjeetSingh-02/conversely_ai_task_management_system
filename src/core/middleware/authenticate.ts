@@ -1,6 +1,6 @@
 // internal-imports
 import { env } from '../config/env.js';
-import { prisma } from '../database/prisma.js';
+import { prisma } from '../database/prisma/client.js';
 import { verifyToken } from '../lib/jwt.js';
 import { ErrorResponse } from '../response/error.js';
 
