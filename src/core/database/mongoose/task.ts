@@ -33,6 +33,15 @@ const schema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'categories',
+      default: null,
+    },
+    tags: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'tags' }],
+      default: [],
+    },
   },
   { timestamps: true }
 );
