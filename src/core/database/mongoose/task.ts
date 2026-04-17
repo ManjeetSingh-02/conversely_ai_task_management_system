@@ -1,11 +1,11 @@
 // internal-imports
-import { APP_CONFIG } from '../config/constants.js';
+import { APP_CONFIG } from '../../config/constants.js';
 
 // external-imports
 import mongoose from 'mongoose';
 
-// schema for task
-const taskSchema = new mongoose.Schema(
+// schema
+const schema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -34,16 +34,14 @@ const taskSchema = new mongoose.Schema(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-// index for createdBy field in task schema
-taskSchema.index({ createdBy: 1 });
+// index for createdBy field in schema
+schema.index({ createdBy: 1 });
 
-// unique index for title and createdBy fields in task schema
-taskSchema.index({ title: 1, createdBy: 1 }, { unique: true });
+// unique index for title and createdBy fields in schema
+schema.index({ title: 1, createdBy: 1 }, { unique: true });
 
-// task model
-export const tasks = mongoose.model('tasks', taskSchema);
+// model
+export const tasks = mongoose.model('tasks', schema);
