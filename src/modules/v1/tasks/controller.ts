@@ -112,7 +112,14 @@ export const controller = {
     if (tags && tags.length > 0) queryFilters.tags = { $in: tags };
 
     // fetch all user tasks from database
-    const userTasks = await tasks.find(queryFilters).select('_id title status').lean();
+    const userTasks = await tasks
+      .find(queryFilters)
+      .select('_id title status category tags')
+      .populate([
+        { path: 'category', select: 'name -_id' },
+        { path: 'tags', select: 'name -_id' },
+      ])
+      .lean();
 
     // return success response with user tasks data
     return response.status(200).json(

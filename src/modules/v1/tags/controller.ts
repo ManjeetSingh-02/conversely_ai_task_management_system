@@ -110,7 +110,7 @@ export const controller = {
   // @controller DELETE /:id
   deleteTag: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
     // get data from validated request
-    const { id } = request.validated!.body! as z.infer<typeof deleteTagSchema>['params'];
+    const { id } = request.validated!.params! as z.infer<typeof deleteTagSchema>['params'];
 
     // fetch tag by id from database
     const existingTag = await tags.findOne({
