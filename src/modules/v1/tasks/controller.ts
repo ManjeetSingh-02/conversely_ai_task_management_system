@@ -100,7 +100,7 @@ export const controller = {
   // @controller GET /
   getTasks: async (request: Request, response: Response<ISuccessResponse<object>>) => {
     // get data from validated request
-    const { category, tags } = request.validated!.query! as z.infer<typeof getTasksSchema>['query'];
+    const { category, tag } = request.validated!.query! as z.infer<typeof getTasksSchema>['query'];
 
     // constants to hold query and sort filters
     const queryFilters: any = { createdBy: request.user!.id };
@@ -108,18 +108,11 @@ export const controller = {
     // if category filter is provided add it in filters object
     if (category) queryFilters.category = category;
 
-    // if tags filter is provided add it in filters object
-    if (tags && tags.length > 0) queryFilters.tags = { $in: tags };
+    // if tag filter is provided add it in filters object
+    if (tag) queryFilters.tags = { $in: [tag] };
 
     // fetch all user tasks from database
-    const userTasks = await tasks
-      .find(queryFilters)
-      .select('_id title status category tags')
-      .populate([
-        { path: 'category', select: 'name -_id' },
-        { path: 'tags', select: 'name -_id' },
-      ])
-      .lean();
+    const userTasks = await tasks.find(queryFilters).select('_id title status').lean();
 
     // return success response with user tasks data
     return response.status(200).json(

@@ -59,7 +59,7 @@ export const createTaskSchema = z.object({
 export const getTasksSchema = z.object({
   query: z.object({
     category: mongooseObjectId.optional(),
-    tags: z.array(mongooseObjectId).optional(),
+    tag: mongooseObjectId.optional(),
   }),
 });
 
