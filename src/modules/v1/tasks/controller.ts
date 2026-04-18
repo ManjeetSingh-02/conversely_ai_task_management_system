@@ -1,5 +1,5 @@
 // internal-imports
-import { APP_CONFIG, ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
+import { categories, ErrorResponse, SuccessResponse, tags, tasks } from '@/core/index.js';
 
 // type-imports
 import type {
@@ -20,7 +20,7 @@ export const controller = {
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
     // get data from validated request
-    const { title, description, dueDate } = request.validated!.body! as z.infer<
+    const { title, description, dueDate, categoryId, tagIds } = request.validated!.body! as z.infer<
       typeof createTaskSchema
     >['body'];
 
@@ -37,69 +37,88 @@ export const controller = {
         })
       );
 
-    // create new task in database
-    const newTask = await tasks.create({
+    // object to hold fields required for task creation
+    const creationData: any = {
       title,
       description,
-      createdBy: request.user!.id,
       dueDate,
-    });
+      createdBy: request.user!.id,
+    };
+
+    // if categoryId is provided, check if it exists and add it in creationData
+    if (categoryId) {
+      const existingCategory = await categories
+        .findOne({ _id: categoryId, createdBy: request.user!.id })
+        .select('id')
+        .lean();
+      if (!existingCategory)
+        return response.status(400).json(
+          new ErrorResponse({
+            code: 'INVALID_CATEGORY',
+            message: 'Category does not exist for the authenticated user',
+          })
+        );
+
+      // add category in creationData
+      creationData.category = existingCategory._id;
+    }
+
+    // if tagIds are provided, check if they exist and add it in creationData
+    if (tagIds) {
+      // remove duplicate tagIds
+      const uniqueTagIds = Array.from(new Set(tagIds));
+      const existingTags = await tags
+        .find({ _id: { $in: uniqueTagIds }, createdBy: request.user!.id })
+        .select('id')
+        .lean();
+
+      // if any of the provided tagIds does not exist, return error response
+      if (existingTags.length !== uniqueTagIds.length)
+        return response.status(400).json(
+          new ErrorResponse({
+            code: 'INVALID_TAGS',
+            message: 'Some tags do not exist for the authenticated user',
+          })
+        );
+
+      // add tags in creationData
+      creationData.tags = existingTags.map(tag => tag._id);
+    }
+
+    // create new task in database
+    const newTask = await tasks.create(creationData);
 
     // return success response with new task data
     return response.status(201).json(
       new SuccessResponse({
         message: 'Task created successfully',
-        data: {
-          id: newTask.id,
-          title: newTask.title,
-          description: newTask.description,
-          status: newTask.status,
-          dueDate: newTask.dueDate,
-        },
+        data: { id: newTask.id, status: newTask.status },
       })
     );
   },
 
   // @controller GET /
-  getTasks: async (request: Request, response: Response<ISuccessResponse<object, object>>) => {
+  getTasks: async (request: Request, response: Response<ISuccessResponse<object>>) => {
     // get data from validated request
-    const { limit, page, sortBy, sortOrder, status } = request.validated!.query! as z.infer<
-      typeof getTasksSchema
-    >['query'];
+    const { category, tags } = request.validated!.query! as z.infer<typeof getTasksSchema>['query'];
 
     // constants to hold query and sort filters
-    const queryFilters: { createdBy: string; status?: string } = { createdBy: request.user!.id };
-    const sortFilters: Record<string, 1 | -1> = {
-      [sortBy]: sortOrder === APP_CONFIG.TASK_CONFIG.SORT_ORDERS.ASC ? 1 : -1,
-    };
+    const queryFilters: any = { createdBy: request.user!.id };
 
-    // if status filter is provided add it in filters object
-    if (status) queryFilters.status = status;
+    // if category filter is provided add it in filters object
+    if (category) queryFilters.category = category;
+
+    // if tags filter is provided add it in filters object
+    if (tags && tags.length > 0) queryFilters.tags = { $in: tags };
 
     // fetch all user tasks from database
-    const userTasks = await tasks
-      .find(queryFilters)
-      .select('_id title status')
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort(sortFilters)
-      .lean();
-
-    // count total user tasks from database
-    const totalUserTasksCount = await tasks.countDocuments({ createdBy: request.user!.id });
+    const userTasks = await tasks.find(queryFilters).select('_id title status').lean();
 
     // return success response with user tasks data
     return response.status(200).json(
       new SuccessResponse({
         message: 'Tasks retrieved successfully',
         data: userTasks,
-        meta: {
-          page,
-          limit,
-          count: userTasks.length,
-          total: totalUserTasksCount,
-          pages: Math.ceil(totalUserTasksCount / limit),
-        },
       })
     );
   },
@@ -110,12 +129,18 @@ export const controller = {
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
     // get data from validated request
-    const { id } = request.validated!.body! as z.infer<typeof getTaskAndDeleteTaskSchema>['params'];
+    const { id } = request.validated!.params! as z.infer<
+      typeof getTaskAndDeleteTaskSchema
+    >['params'];
 
     // fetch task by id from database
     const existingTask = await tasks
       .findOne({ _id: id, createdBy: request.user!.id })
       .select('-createdBy -__v')
+      .populate([
+        { path: 'category', select: 'name -_id' },
+        { path: 'tags', select: 'name -_id' },
+      ])
       .lean();
     if (!existingTask)
       return response.status(404).json(
@@ -137,10 +162,9 @@ export const controller = {
   // @controller PATCH /:id
   updateTask: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
     // get data from validated request
-    const { description, dueDate, status } = request.validated!.body! as z.infer<
-      typeof updateTaskSchema
-    >['body'];
-    const { id } = request.validated!.body! as z.infer<typeof updateTaskSchema>['params'];
+    const { categoryId, description, dueDate, status, tagIds } = request.validated!
+      .body! as z.infer<typeof updateTaskSchema>['body'];
+    const { id } = request.validated!.params! as z.infer<typeof updateTaskSchema>['params'];
 
     // fetch task by id from database
     const existingTask = await tasks.findOne({ _id: id, createdBy: request.user!.id });
@@ -152,20 +176,45 @@ export const controller = {
         })
       );
 
-    // object to hold fields that needs to be updated
-    const updationData: {
-      description?: string;
-      status?: string;
-      dueDate?: Date;
-    } = {};
+    // update task fields with provided data
+    if (description) existingTask.description = description;
+    if (status) existingTask.status = status;
+    if (dueDate) existingTask.dueDate = dueDate;
+    if (categoryId) {
+      const existingCategory = await categories
+        .findOne({ _id: categoryId, createdBy: request.user!.id })
+        .select('id')
+        .lean();
+      if (!existingCategory)
+        return response.status(400).json(
+          new ErrorResponse({
+            code: 'INVALID_CATEGORY',
+            message: 'Category does not exist for the authenticated user',
+          })
+        );
+      existingTask.category = existingCategory._id;
+    }
+    if (tagIds) {
+      // remove duplicate tagIds
+      const uniqueTagIds = Array.from(new Set(tagIds));
+      const existingTags = await tags
+        .find({ _id: { $in: uniqueTagIds }, createdBy: request.user!.id })
+        .select('id')
+        .lean();
 
-    // add task fields in updationData if provided
-    if (description) updationData.description = description;
-    if (status) updationData.status = status;
-    if (dueDate) updationData.dueDate = dueDate;
+      // if any of the provided tagIds does not exist, return error response
+      if (existingTags.length !== uniqueTagIds.length)
+        return response.status(400).json(
+          new ErrorResponse({
+            code: 'INVALID_TAGS',
+            message: 'Some tags do not exist for the authenticated user',
+          })
+        );
+      existingTask.tags = existingTags.map(tag => tag._id);
+    }
 
     // update task in database
-    await tasks.findByIdAndUpdate(existingTask._id, updationData);
+    await existingTask.save();
 
     // return success response indicating successful update
     return response.status(200).json(
@@ -178,7 +227,9 @@ export const controller = {
   // @controller DELETE /:id
   deleteTask: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
     // get data from validated request
-    const { id } = request.validated!.body! as z.infer<typeof getTaskAndDeleteTaskSchema>['params'];
+    const { id } = request.validated!.params! as z.infer<
+      typeof getTaskAndDeleteTaskSchema
+    >['params'];
 
     // fetch task by id from database
     const existingTask = await tasks

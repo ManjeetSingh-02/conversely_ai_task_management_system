@@ -37,27 +37,29 @@ const mongooseObjectId = z
   .trim()
   .refine(id => mongoose.Types.ObjectId.isValid(id), { error: 'Invalid ID' });
 
+// schema for tags
+const tagsSchema = z
+  .array(mongooseObjectId)
+  .min(1, { error: 'At least 1 tag is required' })
+  .max(5, { error: 'At most 5 tags are allowed' })
+  .optional();
+
 // schema for createTask
 export const createTaskSchema = z.object({
   body: z.object({
     title: titleSchema,
     description: descriptionSchema,
     dueDate: dueDateSchema,
+    categoryId: mongooseObjectId.optional(),
+    tagIds: tagsSchema,
   }),
 });
 
 // schema for getTasks
 export const getTasksSchema = z.object({
   query: z.object({
-    status: z.enum(Object.values(APP_CONFIG.TASK_CONFIG.STATUS)).optional(),
-    sortBy: z
-      .enum(Object.values(APP_CONFIG.TASK_CONFIG.SORT_OPTIONS))
-      .default(APP_CONFIG.TASK_CONFIG.SORT_OPTIONS.CREATED_AT),
-    sortOrder: z
-      .enum(Object.values(APP_CONFIG.TASK_CONFIG.SORT_ORDERS))
-      .default(APP_CONFIG.TASK_CONFIG.SORT_ORDERS.DESC),
-    page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(10).default(5),
+    category: mongooseObjectId.optional(),
+    tags: z.array(mongooseObjectId).optional(),
   }),
 });
 
@@ -78,6 +80,8 @@ export const updateTaskSchema = z.object({
       description: descriptionSchema.optional(),
       status: z.enum(Object.values(APP_CONFIG.TASK_CONFIG.STATUS)).optional(),
       dueDate: dueDateSchema.optional(),
+      categoryId: mongooseObjectId.optional(),
+      tagIds: tagsSchema,
     })
     .refine(data => Object.keys(data).length > 0, { error: 'At least one field must be provided' }),
 });
