@@ -14,6 +14,7 @@ Task management system for conversely.ai backend developer internship
 - Node.js
 - pnpm
 - Docker
+- Webhook server
 
 1. Clone the repository and navigate to the project directory:
 ```bash
@@ -43,6 +44,10 @@ ACCESS_TOKEN_SECRET=minimum_of_32_char_access_token_secret
 ACCESS_TOKEN_LIFETIME=900000
 REFRESH_TOKEN_SECRET=minimum_of_32_char_refresh_token_secret
 REFRESH_TOKEN_LIFETIME=86400000
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REMINDER_TIME_BEFORE_DUE_DATE=3600000
+WEBHOOK_URL=http://localhost:4000/webhook
 ```
 
 5. Run prisma migrations to create the necessary tables in the PostgreSQL database:
@@ -93,14 +98,24 @@ pnpm dev
 │   │   │   └── application.ts
 │   │   └── index.ts
 │   ├── core
+│   │   ├── bullmq
+│   │   │   ├── queue.ts
+│   │   │   └── worker.ts
 │   │   ├── config
 │   │   │   ├── constants.ts
 │   │   │   ├── cors.ts
 │   │   │   └── env.ts
 │   │   ├── database
-│   │   │   ├── generated
-│   │   │   ├── mongoose.ts
-│   │   │   └── prisma.ts
+│   │   │   ├── mongoose
+│   │   │   │   ├── category.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── tag.ts
+│   │   │   │   └── task.ts
+│   │   │   ├── prisma
+│   │   │   │   ├── generated
+│   │   │   │   └── client.ts
+│   │   │   ├── redis
+│   │   │   │   └── client.ts
 │   │   ├── lib
 │   │   │   ├── bcrypt.ts
 │   │   │   └── jwt.ts
@@ -122,10 +137,20 @@ pnpm dev
 │   │   └── index.ts
 │   ├── modules
 │   │   └── v1
+│   │       ├── categories
+│   │       │   ├── controller.ts
+│   │       │   ├── module.ts
+│   │       │   ├── route.ts
+│   │       │   └── zod.ts
 │   │       ├── healthcheck
 │   │       │   ├── controller.ts
 │   │       │   ├── module.ts
 │   │       │   └── route.ts
+│   │       ├── tags
+│   │       │   ├── controller.ts
+│   │       │   ├── module.ts
+│   │       │   ├── route.ts
+│   │       │   └── zod.ts
 │   │       ├── tasks
 │   │       │   ├── controller.ts
 │   │       │   ├── module.ts
