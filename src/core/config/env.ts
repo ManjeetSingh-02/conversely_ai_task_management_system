@@ -23,6 +23,7 @@ const envSchema = z.object({
   REFRESH_TOKEN_LIFETIME: z.coerce.number().int().positive(),
   REDIS_HOST: z.string().nonempty({ error: 'REDIS_HOST is required' }),
   REDIS_PORT: z.coerce.number().int().positive(),
+  REMINDER_TIME_BEFORE_DUE_DATE: z.coerce.number().int().positive(),
 });
 
 // function to validate environment variables
