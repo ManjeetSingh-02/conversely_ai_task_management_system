@@ -1,5 +1,6 @@
 // internal-imports
 import {
+  APP_CONFIG,
   categories,
   env,
   ErrorResponse,
@@ -194,11 +195,66 @@ export const controller = {
         })
       );
 
-    // update task fields with provided data
+    // update task description, if provided
     if (description) existingTask.description = description;
-    if (status) existingTask.status = status;
-    if (dueDate) existingTask.dueDate = dueDate;
+
+    // update task status, if provided
+    if (status) {
+      // check if new status is completed
+      if (status === APP_CONFIG.TASK_CONFIG.STATUS.COMPLETED) {
+        // remove existing job for task from reminder queue, if exists
+        const existingJob = await queue.getJob(`reminder_${existingTask._id}`);
+        if (existingJob) await existingJob.remove();
+
+        // send a webhook immediately to notify user about task completion
+      } else {
+        // calculate reminder time based on task due date
+        const reminderTime = new Date(
+          existingTask.dueDate.getTime() - env.REMINDER_TIME_BEFORE_DUE_DATE
+        );
+
+        // add a job in reminder queue with task old due date
+        await queue.add(
+          `reminder_${existingTask._id}`,
+          {
+            message: `Your task "${existingTask.title}" is due in ${env.REMINDER_TIME_BEFORE_DUE_DATE / 60000} minutes`,
+          },
+          { delay: reminderTime.getTime() - Date.now() }
+        );
+      }
+
+      // update task status in database
+      existingTask.status = status;
+    }
+
+    // update task dueDate, if provided
+    if (dueDate) {
+      // get existing job for task from reminder queue
+      const existingJob = await queue.getJob(`reminder_${existingTask._id}`);
+
+      // calculate new reminder time based on new due date
+      const reminderTime = new Date(dueDate.getTime() - env.REMINDER_TIME_BEFORE_DUE_DATE);
+
+      // check if a job already exists, change its delay
+      if (existingJob) await existingJob.changeDelay(reminderTime.getTime() - Date.now());
+      else {
+        // add a job in reminder queue
+        await queue.add(
+          `reminder_${existingTask._id}`,
+          {
+            message: `Your task "${existingTask.title}" is due in ${env.REMINDER_TIME_BEFORE_DUE_DATE / 60000} minutes`,
+          },
+          { delay: reminderTime.getTime() - Date.now() }
+        );
+      }
+
+      // update task due date in database
+      existingTask.dueDate = dueDate;
+    }
+
+    // if categoryId is provided, check if it exists and update task category
     if (categoryId) {
+      // check if category exists in database
       const existingCategory = await categories
         .findOne({ _id: categoryId, createdBy: request.user!.id })
         .select('id')
@@ -210,11 +266,17 @@ export const controller = {
             message: 'Category does not exist for the authenticated user',
           })
         );
+
+      // update task category in database
       existingTask.category = existingCategory._id;
     }
+
+    // if tagIds are provided, check if they exist and update task tags
     if (tagIds) {
       // remove duplicate tagIds
       const uniqueTagIds = Array.from(new Set(tagIds));
+
+      // fetch tags from database and check if they exist for the authenticated user
       const existingTags = await tags
         .find({ _id: { $in: uniqueTagIds }, createdBy: request.user!.id })
         .select('id')
@@ -228,6 +290,8 @@ export const controller = {
             message: 'Some tags do not exist for the authenticated user',
           })
         );
+
+      // update task tags in database
       existingTask.tags = existingTags.map(tag => tag._id);
     }
 
