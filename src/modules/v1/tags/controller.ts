@@ -2,8 +2,10 @@
 import { tags, ErrorResponse, SuccessResponse } from '@/core/index.js';
 
 // type-imports
+import type { createTagSchema, deleteTagSchema, updateTagSchema } from './zod.js';
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
+import type z from 'zod';
 
 // controller for module
 export const controller = {
@@ -12,21 +14,24 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { name } = request.validated!.body! as z.infer<typeof createTagSchema>['body'];
+
     // check if tag already exists
-    const existingTag = await tags.findOne({ name: request.body.name }).select('id').lean();
+    const existingTag = await tags
+      .findOne({ name, createdBy: request.user!.id })
+      .select('id')
+      .lean();
     if (existingTag)
       return response.status(409).json(
         new ErrorResponse({
           code: 'TAG_ALREADY_EXISTS',
-          message: 'A tag with this name already exists',
+          message: 'A tag with this name already exists for the authenticated user',
         })
       );
 
     // create new tag in database
-    const newTag = await tags.create({
-      name: request.body.name,
-      createdBy: request.user!.id,
-    });
+    const newTag = await tags.create({ name, createdBy: request.user!.id });
 
     // return success response with new tag data
     return response.status(201).json(
@@ -59,9 +64,13 @@ export const controller = {
 
   // @controller PATCH /:id
   updateTag: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
+    // get data from validated request
+    const { name } = request.validated!.body! as z.infer<typeof updateTagSchema>['body'];
+    const { id } = request.validated!.body! as z.infer<typeof updateTagSchema>['params'];
+
     // fetch tag by id from database
     const existingTag = await tags.findOne({
-      _id: request.params.id,
+      _id: id,
       createdBy: request.user!.id,
     });
     if (!existingTag)
@@ -74,20 +83,20 @@ export const controller = {
 
     // check if new tag name already exists for another tag
     const tagWithSameName = await tags.findOne({
-      _id: { $ne: request.params.id },
-      name: request.body.name,
+      _id: { $ne: id },
+      name,
       createdBy: request.user!.id,
     });
     if (tagWithSameName)
       return response.status(409).json(
         new ErrorResponse({
           code: 'TAG_ALREADY_EXISTS',
-          message: 'Another tag with this name already exists',
+          message: 'Another tag with this name already exists for the authenticated user',
         })
       );
 
     // update tag name in database
-    existingTag.name = request.body.name;
+    existingTag.name = name;
     await existingTag.save();
 
     // return success response indicating successful update
@@ -100,9 +109,12 @@ export const controller = {
 
   // @controller DELETE /:id
   deleteTag: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
+    // get data from validated request
+    const { id } = request.validated!.body! as z.infer<typeof deleteTagSchema>['params'];
+
     // fetch tag by id from database
     const existingTag = await tags.findOne({
-      _id: request.params.id,
+      _id: id,
       createdBy: request.user!.id,
     });
     if (!existingTag)
