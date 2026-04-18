@@ -1,3 +1,7 @@
+// bullmq
+export { queue } from './bullmq/queue.js';
+export { worker } from './bullmq/worker.js';
+
 // config
 export { APP_CONFIG } from './config/constants.js';
 export { corsConfig } from './config/cors.js';
