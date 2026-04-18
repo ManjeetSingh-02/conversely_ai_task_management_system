@@ -1,5 +1,5 @@
 // internal-imports
-import { tags, ErrorResponse, SuccessResponse } from '@/core/index.js';
+import { tags, ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
 
 // type-imports
 import type { createTagSchema, deleteTagSchema, updateTagSchema } from './zod.js';
@@ -122,6 +122,20 @@ export const controller = {
         new ErrorResponse({
           code: 'TAG_NOT_FOUND',
           message: 'No tag found with the provided ID for the authenticated user',
+        })
+      );
+
+    // check if any tasks are associated with this tag
+    const associatedTasksCount = await tasks.countDocuments({
+      tags: existingTag._id,
+      createdBy: request.user!.id,
+    });
+    if (associatedTasksCount > 0)
+      return response.status(400).json(
+        new ErrorResponse({
+          code: 'TAG_IN_USE',
+          message:
+            'Cannot delete this tag because it is associated with existing tasks for the authenticated user',
         })
       );
 

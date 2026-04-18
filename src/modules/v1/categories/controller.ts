@@ -1,5 +1,5 @@
 // internal-imports
-import { categories, ErrorResponse, SuccessResponse } from '@/core/index.js';
+import { categories, ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
 
 // type-imports
 import type { createCategorySchema, deleteCategorySchema, updateCategorySchema } from './zod.js';
@@ -128,6 +128,20 @@ export const controller = {
         new ErrorResponse({
           code: 'CATEGORY_NOT_FOUND',
           message: 'No category found with the provided ID for the authenticated user',
+        })
+      );
+
+    // check if any tasks are associated with this category
+    const associatedTasksCount = await tasks.countDocuments({
+      category: existingCategory._id,
+      createdBy: request.user!.id,
+    });
+    if (associatedTasksCount > 0)
+      return response.status(400).json(
+        new ErrorResponse({
+          code: 'CATEGORY_IN_USE',
+          message:
+            'Cannot delete category as it is associated with existing tasks for the authenticated user',
         })
       );
 
