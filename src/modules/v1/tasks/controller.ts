@@ -1,5 +1,13 @@
 // internal-imports
-import { categories, ErrorResponse, SuccessResponse, tags, tasks } from '@/core/index.js';
+import {
+  categories,
+  env,
+  ErrorResponse,
+  queue,
+  SuccessResponse,
+  tags,
+  tasks,
+} from '@/core/index.js';
 
 // type-imports
 import type {
@@ -87,6 +95,16 @@ export const controller = {
 
     // create new task in database
     const newTask = await tasks.create(creationData);
+
+    // add a job in reminder queue to send reminder 1 hour before task due date
+    const reminderTime = new Date(newTask.dueDate.getTime() - env.REMINDER_TIME_BEFORE_DUE_DATE);
+    await queue.add(
+      `reminder_${newTask._id}`,
+      {
+        message: `Your task "${newTask.title}" is due in ${env.REMINDER_TIME_BEFORE_DUE_DATE / 60000} minutes`,
+      },
+      { delay: reminderTime.getTime() - Date.now() }
+    );
 
     // return success response with new task data
     return response.status(201).json(
