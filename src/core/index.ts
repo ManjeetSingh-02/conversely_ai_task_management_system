@@ -6,6 +6,7 @@ export { env } from './config/env.js';
 // database
 export { prisma } from './database/prisma/client.js';
 export { tasks, categories, tags } from './database/mongoose/index.js';
+export { redis } from './database/redis/client.js';
 
 // lib
 export { compareHashedData, hashData } from './lib/bcrypt.js';
