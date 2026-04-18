@@ -24,6 +24,7 @@ const envSchema = z.object({
   REDIS_HOST: z.string().nonempty({ error: 'REDIS_HOST is required' }),
   REDIS_PORT: z.coerce.number().int().positive(),
   REMINDER_TIME_BEFORE_DUE_DATE: z.coerce.number().int().positive(),
+  WEBHOOK_URL: z.url({ error: 'WEBHOOK_URL must be a valid URL' }),
 });
 
 // function to validate environment variables
