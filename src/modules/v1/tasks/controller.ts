@@ -206,7 +206,34 @@ export const controller = {
         const existingJob = await queue.getJob(`reminder_${existingTask._id}`);
         if (existingJob) await existingJob.remove();
 
-        // send a webhook immediately to notify user about task completion
+        // variables and function for retrying webhook call
+        const retries = 3;
+        const sendWebHook = async () => {
+          await fetch(env.WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: existingTask._id,
+              userId: existingTask.createdBy,
+              title: existingTask.title,
+              description: existingTask.description,
+              dueDate: existingTask.dueDate,
+              completionDate: new Date(),
+            }),
+          });
+        };
+        const wait = (s: number) => new Promise(resolve => setTimeout(resolve, s * 1000));
+
+        // retry the webhook call if it fails
+        for (let attempt = 1; attempt <= retries; attempt++) {
+          try {
+            await sendWebHook();
+            break;
+          } catch (error) {
+            console.error(`Attempt ${attempt} failed:`, error);
+            if (attempt < retries) await wait(5);
+          }
+        }
       } else {
         // calculate reminder time based on task due date
         const reminderTime = new Date(
