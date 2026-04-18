@@ -38,7 +38,7 @@ export const controller = {
       );
 
     // object to hold fields required for task creation
-    const creationData: any = {
+    const creationData: Record<string, unknown> = {
       title,
       description,
       dueDate,
@@ -103,7 +103,7 @@ export const controller = {
     const { category, tag } = request.validated!.query! as z.infer<typeof getTasksSchema>['query'];
 
     // constants to hold query and sort filters
-    const queryFilters: any = { createdBy: request.user!.id };
+    const queryFilters: Record<string, unknown> = { createdBy: request.user!.id };
 
     // if category filter is provided add it in filters object
     if (category) queryFilters.category = category;
