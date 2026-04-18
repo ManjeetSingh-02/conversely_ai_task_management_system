@@ -11,8 +11,10 @@ import {
 } from '@/core/index.js';
 
 // type-imports
+import type { userCredentialsSchema } from './zod.js';
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
+import type z from 'zod';
 
 // controller for module
 export const controller = {
@@ -21,10 +23,13 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { email, password } = request.validated!.body! as z.infer<
+      typeof userCredentialsSchema
+    >['body'];
+
     // check if user already exists
-    const existingUser = await prisma.users.findUnique({
-      where: { email: request.body.email },
-    });
+    const existingUser = await prisma.users.findUnique({ where: { email } });
     if (existingUser)
       return response.status(409).json(
         new ErrorResponse({
@@ -35,10 +40,7 @@ export const controller = {
 
     // create new user in database
     const newUser = await prisma.users.create({
-      data: {
-        email: request.body.email,
-        password: await hashData(request.body.password, 10),
-      },
+      data: { email, password: await hashData(password, 10) },
     });
 
     // return success response with new user data
@@ -75,11 +77,14 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { email, password } = request.validated!.body! as z.infer<
+      typeof userCredentialsSchema
+    >['body'];
+
     // check if login credentials are valid
-    const existingUser = await prisma.users.findUnique({
-      where: { email: request.body.email },
-    });
-    if (!existingUser || !(await compareHashedData(request.body.password, existingUser.password)))
+    const existingUser = await prisma.users.findUnique({ where: { email } });
+    if (!existingUser || !(await compareHashedData(password, existingUser.password)))
       return response.status(401).json(
         new ErrorResponse({
           code: 'INVALID_CREDENTIALS',
