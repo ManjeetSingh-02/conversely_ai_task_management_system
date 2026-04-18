@@ -134,7 +134,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"Title-1\",\n    \"description\": \"Title-1 Desc\",\n    \"dueDate\": \"2026-06-01T12:01:30-05:00\"\n}",
+              "raw": "{\n    \"title\": \"Title-1\",\n    \"description\": \"Description\",\n    \"dueDate\": \"2026-06-01T12:01:30-05:00\",\n    \"categoryId\": \"69e355abefabdc6f40700927\",\n    \"tagIds\": [\"69e3549f7527cf7e354706fc\", \"69e355ddefabdc6f40700928\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -155,29 +155,17 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{localhost:3000}}{{api/v1}}/tasks?status=pending&sortBy=dueDate&sortOrder=asc&page=1&limit=3",
+              "raw": "{{localhost:3000}}{{api/v1}}/tasks?category=69e355abefabdc6f40700927&tag=69e3549f7527cf7e354706fc",
               "host": ["{{localhost:3000}}{{api/v1}}"],
               "path": ["tasks"],
               "query": [
                 {
-                  "key": "status",
-                  "value": "pending"
+                  "key": "category",
+                  "value": "69e355abefabdc6f40700927"
                 },
                 {
-                  "key": "sortBy",
-                  "value": "dueDate"
-                },
-                {
-                  "key": "sortOrder",
-                  "value": "asc"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "3"
+                  "key": "tag",
+                  "value": "69e3549f7527cf7e354706fc"
                 }
               ]
             }
@@ -196,7 +184,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69e0a1d118bea5b14c6f334f"
+                  "value": "69e34fe92ccc35c068f94dd0"
                 }
               ]
             }
@@ -210,7 +198,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"description\": \"Title-1 Desc\",\n    \"status\": \"completed\",\n    \"dueDate\": \"2027-06-01T12:01:30-05:00\"\n}",
+              "raw": "{\n    \"description\": \"Description-1\",\n    \"status\": \"completed\",\n    \"dueDate\": \"2027-06-01T12:01:30-05:00\",\n    \"categoryId\": \"69e34f652ccc35c068f94dcd\",\n    \"tagIds\": [\"69e34faa2ccc35c068f94dce\", \"69e34fad2ccc35c068f94dcf\"]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -224,7 +212,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69e0a1d118bea5b14c6f334f"
+                  "value": "69e34fe92ccc35c068f94dd0"
                 }
               ]
             }
@@ -243,7 +231,241 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "69e0a21518bea5b14c6f335b"
+                  "value": "69e34fe92ccc35c068f94dd0"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{access_token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        }
+      ]
+    },
+    {
+      "name": "categories",
+      "item": [
+        {
+          "name": "/",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Category-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/categories",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/categories",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Category-A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/categories/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69e3262a22e640fc6cd24742"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/categories/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69e3548e7527cf7e354706fb"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{access_token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [""]
+          }
+        }
+      ]
+    },
+    {
+      "name": "tags",
+      "item": [
+        {
+          "name": "/",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Tag-1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tags",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tags"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tags",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tags"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Tag-A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tags/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tags", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69e2a55407d2ec7d1570494b"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost:3000}}{{api/v1}}/tags/:id",
+              "host": ["{{localhost:3000}}{{api/v1}}"],
+              "path": ["tags", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69e3549f7527cf7e354706fc"
                 }
               ]
             }
