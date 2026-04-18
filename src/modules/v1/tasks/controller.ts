@@ -2,17 +2,15 @@
 import { APP_CONFIG, ErrorResponse, SuccessResponse, tasks } from '@/core/index.js';
 
 // type-imports
+import type {
+  createTaskSchema,
+  getTaskAndDeleteTaskSchema,
+  getTasksSchema,
+  updateTaskSchema,
+} from './zod.js';
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
-
-// type definition for query
-type Query = {
-  status?: string;
-  sortBy: string;
-  sortOrder: string;
-  page: number;
-  limit: number;
-};
+import type z from 'zod';
 
 // controller for module
 export const controller = {
@@ -21,22 +19,30 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { title, description, dueDate } = request.validated!.body! as z.infer<
+      typeof createTaskSchema
+    >['body'];
+
     // check if task already exists
-    const existingTask = await tasks.findOne({ title: request.body.title }).select('id').lean();
+    const existingTask = await tasks
+      .findOne({ title, createdBy: request.user!.id })
+      .select('id')
+      .lean();
     if (existingTask)
       return response.status(409).json(
         new ErrorResponse({
           code: 'TASK_ALREADY_EXISTS',
-          message: 'A task with this title already exists',
+          message: 'A task with this title already exists for the authenticated user',
         })
       );
 
     // create new task in database
     const newTask = await tasks.create({
-      title: request.body.title,
-      description: request.body.description,
+      title,
+      description,
       createdBy: request.user!.id,
-      dueDate: request.body.dueDate,
+      dueDate,
     });
 
     // return success response with new task data
@@ -56,22 +62,26 @@ export const controller = {
 
   // @controller GET /
   getTasks: async (request: Request, response: Response<ISuccessResponse<object, object>>) => {
-    // constants to hold query and filters
-    const query = request.validated!.query as Query;
+    // get data from validated request
+    const { limit, page, sortBy, sortOrder, status } = request.validated!.query! as z.infer<
+      typeof getTasksSchema
+    >['query'];
+
+    // constants to hold query and sort filters
     const queryFilters: { createdBy: string; status?: string } = { createdBy: request.user!.id };
     const sortFilters: Record<string, 1 | -1> = {
-      [query.sortBy]: query.sortOrder === APP_CONFIG.TASK_CONFIG.SORT_ORDERS.ASC ? 1 : -1,
+      [sortBy]: sortOrder === APP_CONFIG.TASK_CONFIG.SORT_ORDERS.ASC ? 1 : -1,
     };
 
     // if status filter is provided add it in filters object
-    if (query.status) queryFilters.status = query.status;
+    if (status) queryFilters.status = status;
 
     // fetch all user tasks from database
     const userTasks = await tasks
       .find(queryFilters)
       .select('_id title status')
-      .skip((query.page - 1) * query.limit)
-      .limit(query.limit)
+      .skip((page - 1) * limit)
+      .limit(limit)
       .sort(sortFilters)
       .lean();
 
@@ -84,11 +94,11 @@ export const controller = {
         message: 'Tasks retrieved successfully',
         data: userTasks,
         meta: {
-          page: query.page,
-          limit: query.limit,
+          page,
+          limit,
           count: userTasks.length,
           total: totalUserTasksCount,
-          pages: Math.ceil(totalUserTasksCount / query.limit),
+          pages: Math.ceil(totalUserTasksCount / limit),
         },
       })
     );
@@ -99,12 +109,12 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { id } = request.validated!.body! as z.infer<typeof getTaskAndDeleteTaskSchema>['params'];
+
     // fetch task by id from database
     const existingTask = await tasks
-      .findOne({
-        _id: request.params.id,
-        createdBy: request.user!.id,
-      })
+      .findOne({ _id: id, createdBy: request.user!.id })
       .select('-createdBy -__v')
       .lean();
     if (!existingTask)
@@ -126,11 +136,14 @@ export const controller = {
 
   // @controller PATCH /:id
   updateTask: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
+    // get data from validated request
+    const { description, dueDate, status } = request.validated!.body! as z.infer<
+      typeof updateTaskSchema
+    >['body'];
+    const { id } = request.validated!.body! as z.infer<typeof updateTaskSchema>['params'];
+
     // fetch task by id from database
-    const existingTask = await tasks.findOne({
-      _id: request.params.id,
-      createdBy: request.user!.id,
-    });
+    const existingTask = await tasks.findOne({ _id: id, createdBy: request.user!.id });
     if (!existingTask)
       return response.status(404).json(
         new ErrorResponse({
@@ -147,9 +160,9 @@ export const controller = {
     } = {};
 
     // add task fields in updationData if provided
-    if (request.body.description) updationData.description = request.body.description;
-    if (request.body.status) updationData.status = request.body.status;
-    if (request.body.dueDate) updationData.dueDate = request.body.dueDate;
+    if (description) updationData.description = description;
+    if (status) updationData.status = status;
+    if (dueDate) updationData.dueDate = dueDate;
 
     // update task in database
     await tasks.findByIdAndUpdate(existingTask._id, updationData);
@@ -164,12 +177,12 @@ export const controller = {
 
   // @controller DELETE /:id
   deleteTask: async (request: Request, response: Response<ISuccessResponse | IErrorResponse>) => {
+    // get data from validated request
+    const { id } = request.validated!.body! as z.infer<typeof getTaskAndDeleteTaskSchema>['params'];
+
     // fetch task by id from database
     const existingTask = await tasks
-      .findOne({
-        _id: request.params.id,
-        createdBy: request.user!.id,
-      })
+      .findOne({ _id: id, createdBy: request.user!.id })
       .select('_id')
       .lean();
     if (!existingTask)
