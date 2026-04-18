@@ -2,8 +2,10 @@
 import { categories, ErrorResponse, SuccessResponse } from '@/core/index.js';
 
 // type-imports
+import type { createCategorySchema, deleteCategorySchema, updateCategorySchema } from './zod.js';
 import type { IErrorResponse, ISuccessResponse } from '@/core/index.js';
 import type { Request, Response } from 'express';
+import type z from 'zod';
 
 // controller for module
 export const controller = {
@@ -12,24 +14,24 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse<object> | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { name } = request.validated!.body! as z.infer<typeof createCategorySchema>['body'];
+
     // check if category already exists
     const existingCategory = await categories
-      .findOne({ name: request.body.name })
+      .findOne({ name, createdBy: request.user!.id })
       .select('id')
       .lean();
     if (existingCategory)
       return response.status(409).json(
         new ErrorResponse({
           code: 'CATEGORY_ALREADY_EXISTS',
-          message: 'A category with this name already exists',
+          message: 'A category with this name already exists for the authenticated user',
         })
       );
 
     // create new category in database
-    const newCategory = await categories.create({
-      name: request.body.name,
-      createdBy: request.user!.id,
-    });
+    const newCategory = await categories.create({ name, createdBy: request.user!.id });
 
     // return success response with new category data
     return response.status(201).json(
@@ -65,9 +67,13 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { name } = request.validated!.body! as z.infer<typeof updateCategorySchema>['body'];
+    const { id } = request.validated!.params! as z.infer<typeof updateCategorySchema>['params'];
+
     // fetch category by id from database
     const existingCategory = await categories.findOne({
-      _id: request.params.id,
+      _id: id,
       createdBy: request.user!.id,
     });
     if (!existingCategory)
@@ -80,20 +86,20 @@ export const controller = {
 
     // check if new category name already exists for another category
     const categoryWithSameName = await categories.findOne({
-      _id: { $ne: request.params.id },
-      name: request.body.name,
+      _id: { $ne: id },
+      name,
       createdBy: request.user!.id,
     });
     if (categoryWithSameName)
       return response.status(409).json(
         new ErrorResponse({
           code: 'CATEGORY_ALREADY_EXISTS',
-          message: 'Another category with this name already exists',
+          message: 'Another category with this name already exists for the authenticated user',
         })
       );
 
     // update category name in database
-    existingCategory.name = request.body.name;
+    existingCategory.name = name;
     await existingCategory.save();
 
     // return success response indicating successful update
@@ -109,9 +115,12 @@ export const controller = {
     request: Request,
     response: Response<ISuccessResponse | IErrorResponse>
   ) => {
+    // get data from validated request
+    const { id } = request.validated!.params! as z.infer<typeof deleteCategorySchema>['params'];
+
     // fetch category by id from database
     const existingCategory = await categories.findOne({
-      _id: request.params.id,
+      _id: id,
       createdBy: request.user!.id,
     });
     if (!existingCategory)
